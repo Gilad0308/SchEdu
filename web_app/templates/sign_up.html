@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+<title>Sign Up</title>
+
+{% endblock %}
+
+{% block body %}
+
+
+<form autocomplete="off" action="{{ url_for('auth.sign_up')}}" method="POST">
+    <br>
+    <h3 align="center">Sign Up</h3>
+    <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" class="form-control" id="email" name="email" maxlength="150" placeholder="Enter email" required>
+    </div>
+    <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" class="form-control" id="name" name="name" minlength="2" maxlength="150" placeholder="Enter name" required>
+    </div>
+    <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" class="form-control" id="password" name="password" maxlength="150" placeholder="Enter password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="at least one number and one uppercase and lowercase letter, and at least 8 or more characters"  required>
+    </div>
+    <div class="form-group">
+        <label for="confirm_password">Password Confirmation</label>
+        <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm password" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+<script src="/static/js/confirmPassword.js"></script>
+
+
+{% endblock %}

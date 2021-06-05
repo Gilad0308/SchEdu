@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <script src="/static/js/tableSearch.js"></script>
+    <title>Subjects</title>
+{% endblock %}
+
+{% block body %}
+
+    <div class="h-100 p-5 bg-light border rounded-3">
+        <h2>Subjects</h2>
+        <p>Here you can specify the subjects studied and taught in school</p>
+        <div class="row">
+            <div class="col">
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addModal">Add Subject</button>
+            </div>
+            <div class="col text-right">
+                <a type="button" class="btn btn-link" href="{{ url_for('views.teachers') }}">Continue to Teachers >></a>
+            </div>
+        </div>
+    </div>
+
+    &nbsp;&nbsp;
+    
+    <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Add Subject</h5>
+                </div>
+
+                <div class="modal-body">
+                    <form autocomplete="off" action="{{url_for('views.subjects')}}" method='POST'>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group row">
+                                    <div class="col-lg">
+                                        <label for="name">Subject Name</label>
+                                        <input class="form-control" type="text" name="name" id="name" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group row">
+                                    <div class="col-lg">
+                                        <label for="level">Level (number of points)</label>
+                                        <input class="form-control" type="number" name="level" id="level" min="1" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Add</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <br>
+    {% if subjects|length > 0 %}
+        <input class="form-control mb-2" id="myInput" type="text" placeholder="Search...">
+        <div class="table-responsive-md">
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Level (number of points)</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody id="myTable">
+                {% for subject in subjects %}
+                    <tr>
+                        <td>{{ subject.name }}</td>
+                        <td>{{ subject.level }}</td>
+                        <td>
+                            <div class="row justify-content-center">
+                                <form method="post" action="{{ url_for('views.edit_subject') }}">
+                                    <input type="hidden" id="id" name="id" value="{{ subject.subject_id }}">
+                                    <input type="hidden" id="action" name="action" value="send">
+                                    <button class="btn btn-warning ml-2 mr-2 mt-1 mb-1" type="submit">Edit</button>
+                                </form>
+                                <form method="post" action="{{ url_for('views.delete_subject') }}">
+                                    <input type="hidden" id="id" name="id" value="{{ subject.subject_id }}">
+                                    <button class="btn btn-danger ml-2 mr-2 mt-1 mb-1" type="submit">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        <div>
+    {% else %}
+        <h6>Currently there are no subjects</h6>
+    {% endif %}
+    
+{% endblock %}

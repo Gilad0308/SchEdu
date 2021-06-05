@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+    <title>Home</title>
+
+{% endblock %}
+
+
+{% block body %}
+
+    <br>
+    <div class="starter-template">
+        <h2>Welcome to SchEdu – your smart Education Scheduler!</h2>
+        <p class="lead">
+            Quickly and easily create perfect class schedules for your school needs.<br>
+            Simply define your schedule framework, study data & classes, and let SchEdu’s smart algorithm take care of the rest.<br>
+            Just click the ‘Get started’ button and follow the instructions.
+        </p>
+
+        <button type="button" class="btn btn-info mr-1" data-toggle="collapse" data-target="#moreInfo" aria-expanded="false" aria-controls="moreInfo">More information</button>
+        <a type="button" class="btn btn-success ml-1" href="{{ url_for('views.classtimes') }}">Get Started >></a>
+
+        <div class="collapse mt-4" id="moreInfo">
+            <div class="card card-body">
+                <p class="lead">
+                    To begin your SchEdu configuration, follow these three simple steps:<br>
+                    <strong>1. Framework</strong> – define your ‘when & where’ including available study days, class hours & classrooms.<br>
+                    <strong>2. Study Data</strong> – provide the data required to populate the study framework including desired subjects, corresponding teachers & study groups.<br>
+                    <strong>3. Classes</strong> – aggregate your study data into classes.<br>
+                    Then, go to 'Schedules', click 'Create' and let the SchEdu smart algorithm build your perfect schedule.<br>
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+    
+  
+{% endblock %}
+
+
+
+

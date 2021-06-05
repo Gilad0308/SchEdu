@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+    <title>Edit Subject</title>
+
+{% endblock %}
+
+{% block body %}
+    <br>
+    <div class="row justify-content-md-center">
+    <div class="col col-md-9">
+        <div class="card">
+            <h5 class="card-header bg-white mt-1 mb-1">Edit Subject</h5>
+            <div class="card-body">
+                
+                <form autocomplete="off" action="{{url_for('views.edit_subject')}}" method='POST'>
+                    <input type="hidden" id="id" name="id" value="{{ subject.subject_id }}">
+                    <input type="hidden" id="action" name="action" value="retrieve">
+                    
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group row">
+                                <div class="col-lg">
+                                    <label for="name">Name</label>
+                                    <input class="form-control" type="text" name="name" id="name" required value="{{ subject.name }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group row">
+                                <div class="col-lg">
+                                    <label for="level">Level (number of points)</label>
+                                    <input class="form-control" type="number" name="level" id="level" min="1" required value="{{ subject.level }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-right mt-4 mb-2">
+                        <a type="button" class="btn btn-secondary mr-2" href="{{ url_for('views.subjects') }}">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                    
+                </form>
+             
+            </div>
+        </div>
+    </div>
+    </div>
+
+{% endblock %}

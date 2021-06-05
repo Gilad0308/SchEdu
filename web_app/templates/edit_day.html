@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+    <title>Edit Day</title>
+
+{% endblock %}
+
+{% block body %}
+    <br>
+    <div class="row justify-content-md-center">
+    <div class="col col-md-9">
+        <div class="card">
+            <h5 class="card-header bg-white mt-1 mb-1">Edit School Day</h5>
+            <div class="card-body">
+                
+                <form action="{{url_for('views.edit_day')}}" method='POST'>
+                    <input type="hidden" id="id" name="id" value="{{ day.day_id }}">
+                    <input type="hidden" id="action" name="action" value="retrieve">
+                    
+                    <div class="row">
+                        <div class="col">
+                            <label for="day_name">Day in the week</label>
+                            <div class="form-group">
+                                <select class="selectpicker" data-size="7" id="day_name" name="day_name" required data-width="100%">
+                                    {% for str_day in left_days_dict %}
+                                        {% if left_days_dict[str_day] %}
+                                            {% if str_day == day.name %}
+                                                <option selected>{{ str_day }}</option>
+                                            {% else %}
+                                                <option>{{ str_day }}</option>
+                                            {% endif %}
+                                        {% else %}
+                                            <option disabled data-subtext="(Already Chosen)">{{ str_day }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <label for="last_ct_id">Last lesson*</label>
+                            <div class="form-group">
+                                <select class="selectpicker" data-size="7" id="last_ct_id" name="last_ct_id" required data-width="100%">
+                                    {% for classtime in classtimes %}
+                                        {% if classtime.class_time_id == day.last_class_time.class_time_id %}
+                                            <option selected value="{{ classtime.class_time_id }}">
+                                                lesson {{ classtime.index }} ({{ classtime.start_time }} - {{ classtime.end_time }})
+                                            </option>
+                                        {% else %}
+                                            <option value="{{ classtime.class_time_id }}">
+                                                lesson {{ classtime.index }} ({{ classtime.start_time }} - {{ classtime.end_time }})
+                                            </option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class = "row mb-2 ml-2">
+                        <small>*Every day starts from the first lesson</small>
+                    </div>
+                    
+                    <div class="text-right mt-4 mb-2">
+                        <a type="button" class="btn btn-secondary mr-2" href="{{ url_for('views.days') }}">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                    
+                </form>
+             
+            </div>
+        </div>
+    </div>
+    </div>
+
+{% endblock %}

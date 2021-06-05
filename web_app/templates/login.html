@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Log in</title>
+{% endblock %}
+
+{% block body %}
+<form autocomplete="off" method="POST">
+    <br>
+    <h3 align="center">Log in</h3>
+ 
+    <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" required/>
+    </div>
+    <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required/>
+    </div>
+
+        
+    <button type="submit" class="btn btn-primary mr-4">Log in</button>
+</form>
+
+<label class="mt-2" for="sign_up">Don't have an account?</label>
+<a type="button" class="btn btn-link mb-2" id="sign_up" href="{{ url_for('auth.sign_up') }}">Sign Up</a>
+
+{% endblock %}

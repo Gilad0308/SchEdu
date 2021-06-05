@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<script src="/static/js/tableSearch.js"></script>
+<script src="/static/js/loadingSpinner.js"></script>
+<title>Schedules</title>
+{% endblock %}
+
+{% block body %}
+
+<br>
+<div class="card">
+    <h5 class="card-header">Create Schedule</h5>
+    <div class="card-body">
+        <p class="card-title">Create a new schedule according to your current configuration.</p>
+        <p class="card-text">Each one of the classes will be assigned to a suitable day, hour and classroom.</p>
+        <form autocomplete="off" id="create_schedule" class="form-inline" action="{{ url_for('algorithm.create_schedule') }}" method='POST'>
+            <div class="form-group mr-2">
+                <input type="text" class="form-control" name="name" id="name" placeholder="Name (optional)">
+            </div>
+            <div class="form-group">
+                <button id="btnFetch" type="submit" class="btn btn-success">Create</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<br>
+<div class="card">
+    <h5 class="card-header">Your Schedules</h5>
+    <div class="card-body">
+        {% if schedules|length > 0 %}
+            <input class="form-control mb-2" id="myInput" type="text" placeholder="Search...">
+            <div class="table-responsive-md">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                        <th scope="col"></th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Date created</th>
+                        <th scope="col"></th>
+                    </tr>
+                    </thead>
+                    <tbody id="myTable">
+                        {% set ns = namespace(index=1) %}
+                        {% for schedule in schedules %}
+                            <tr>
+                                <th scope="row">{{ ns.index }}</th>
+                                {% if schedule.name %}
+                                    <td>{{ schedule.name }}</td>
+                                {% else %}
+                                <td>-</td>
+                                {% endif %}
+                                <td><h6>{{ schedule.date_created.strftime("%d/%m/%Y, %H:%M") }}</h6></td>
+                                <td>
+                                    <div class="row justify-content-center">
+                                        <form method="post" action="{{ url_for('views.schedules') }}">
+                                            <input type="hidden" id="id" name="id" value="{{ schedule.schedule_id }}">
+                                            <button class="btn btn-primary ml-2 mr-2 mt-1 mb-1" type="submit">View & Edit</button>
+                                        </form>
+                                        <form method="post" action="{{ url_for('views.delete_schedule') }}">
+                                            <input type="hidden" id="id" name="id" value="{{ schedule.schedule_id }}">
+                                            <button class="btn btn-danger ml-2 mr-2 mt-1 mb-1" type="submit">Delete</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% set ns.index = ns.index + 1 %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <h6>Currently there are no schedules</h6>
+        {% endif %}          
+    </div>
+</div>
+
+{% endblock %}

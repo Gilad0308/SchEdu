@@ -1,0 +1,3 @@
+[console_scripts]
+rptree = rptree.__main__:main
+

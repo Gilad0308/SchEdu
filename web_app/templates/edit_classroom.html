@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+    <title>Edit Classroom</title>
+
+{% endblock %}
+
+{% block body %}
+    <br>
+    <div class="row justify-content-md-center">
+    <div class="col col-md-9">
+        <div class="card">
+            <h5 class="card-header bg-white mt-1 mb-1">Edit Classroom</h5>
+            <div class="card-body">
+                
+                <form autocomplete="off" action="{{url_for('views.edit_classroom')}}" method='POST'>
+                    <input type="hidden" id="id" name="id" value="{{ classroom.classroom_id }}">
+                    <input type="hidden" id="action" name="action" value="retrieve">
+                    
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group row">
+                                <div class="col-lg">
+                                    <label for="name">Classroom Name</label>
+                                    <input class="form-control" type="text" name="name" id="name" required value="{{ classroom.name }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group row">
+                                <div class="col-lg">
+                                    <label for="num_seats">Number of Seats</label>
+                                    <input class="form-control" type="number" name="num_seats" id="num_seats" min="1" required value="{{ classroom.num_seats }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card" name="mycard" id="mycard">
+                        <div class="card-header">
+                            Equipment (optional)
+                        </div>
+                        <div class="card-body">
+                            <div class="form-check form-check-inline">
+                                {% if classroom.equipment.computers_lab %}
+                                    <input class="form-check-input" type="checkbox" name="{{ equipment_options[0] }}" id="{{ equipment_options[0] }}" value="True" checked>
+                                {% else %}
+                                    <input class="form-check-input" type="checkbox" name="{{ equipment_options[0] }}" id="{{ equipment_options[0] }}" value="True">
+                                {% endif %}
+                                <label class="form-check-label" for="{{ equipment_options[0] }}">{{ equipment_options[0] }}</label><br>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                {% if classroom.equipment.physics_lab %}
+                                    <input class="form-check-input" type="checkbox" name="{{ equipment_options[1] }}" id="{{ equipment_options[1] }}" value="True" checked>
+                                {% else %}
+                                    <input class="form-check-input" type="checkbox" name="{{ equipment_options[1] }}" id="{{ equipment_options[1] }}" value="True">
+                                {% endif %}
+                                <label class="form-check-label" for="{{ equipment_options[1] }}">{{ equipment_options[1] }}</label><br>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                {% if classroom.equipment.chemistry_lab %}
+                                    <input class="form-check-input" type="checkbox" name="{{ equipment_options[2] }}" id="{{ equipment_options[2] }}" value="True" checked>
+                                {% else %}
+                                    <input class="form-check-input" type="checkbox" name="{{ equipment_options[2] }}" id="{{ equipment_options[2] }}" value="True">
+                                {% endif %}
+                                <label class="form-check-label" for="{{ equipment_options[2] }}">{{ equipment_options[2] }}</label><br>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                {% if classroom.equipment.biology_lab %}
+                                    <input class="form-check-input" type="checkbox" name="{{ equipment_options[3] }}" id="{{ equipment_options[3] }}" value="True" checked>
+                                {% else %}
+                                    <input class="form-check-input" type="checkbox" name="{{ equipment_options[3] }}" id="{{ equipment_options[3] }}" value="True">
+                                {% endif %}
+                                <label class="form-check-label" for="{{ equipment_options[3] }}">{{ equipment_options[3] }}</label><br>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-right mt-4 mb-2">
+                        <a type="button" class="btn btn-secondary mr-2" href="{{ url_for('views.classrooms') }}">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                    
+                </form>
+             
+            </div>
+        </div>
+    </div>
+    </div>
+
+{% endblock %}

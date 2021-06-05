@@ -1,0 +1,295 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<link rel="stylesheet" href="/static/css/scheduleLayout.css">
+<link rel="stylesheet" href="/static/css/cardOpenClose.css">
+<script src="/static/js/expandCollapse.js"></script>
+
+<title>Schedule View</title>
+{% endblock %}
+{% block body %}
+
+<div class="t full-width">
+    {% if schedule.name %}
+        <h3>Schedule: {{ schedule.name }}</h3>
+    {% else %}
+        <h3>Schedule: </h3>
+    {% endif %}
+    <h5>Created on: {{ schedule.date_created.strftime("%d/%m/%Y, %H:%M") }}</h5>
+
+    <div class="row">
+        <div class="col">
+            <div class="btn-group" role="group" aria-label="Basic example">
+                <button class="btn btn-outline-info mt-2 mb-2" data-toggle="collapse" href="#filterOptions" role="button" aria-expanded="true" aria-controls="filterOptions">Filter</button>
+                <a class="btn btn-outline-info mt-2 mb-2" href="{{ url_for('views.show_schedule') }}">Show all</a>
+            </div>
+        </div>
+        <div class="col text-right">
+            <div class="btn-group" role="group" aria-label="Basic example">
+                <button type="button" class="btn btn-link mt-2 mb-2" onclick="expandAll()">Expand all</button>
+                <button type="button" class="btn btn-link mt-2 mb-2" onclick="collapseAll()">Collapse all</button>
+            </div>
+        </div>
+    </div>
+    
+    {% if is_filter %}
+        {% set class_name = "collapse show" %}
+    {% else %}
+        {% set class_name = "collapse" %}
+    {% endif %}
+    <div class="{{ class_name }}" id="filterOptions">
+        <div class="card card-body mb-2">
+            
+            <form action="{{url_for('views.show_schedule')}}" method='POST'>
+                
+                <div class="form-check form-check-inline mb-2">
+                    {% if or_true_and_false %}
+                        <input class="form-check-input" type="radio" name="or_and" id="or" value="1" checked>
+                    {% else %}
+                        <input class="form-check-input" type="radio" name="or_and" id="or" value="1">
+                    {% endif %}
+                    <u class="form-check-label" for="or" data-toggle="tooltip" data-placement="right" 
+                    title="Show classes that satisfy at least one of the following selections" <i class="fa fa-chevron-down pull-right"></i>OR</u>
+                </div>
+                <div class="form-check form-check-inline mb-2">
+                    {% if or_true_and_false %}
+                        <input class="form-check-input" type="radio" name="or_and" id="and" value="0">
+                    {% else %}
+                        <input class="form-check-input" type="radio" name="or_and" id="and" value="0" checked>
+                    {% endif %}
+                    <u class="form-check-label" for="and" data-toggle="tooltip" data-placement="right" 
+                    title="Show only classes that satisfy all of the following selections" <i class="fa fa-chevron-down pull-right"></i>AND</u>
+                </div>
+                
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="subject_ids">Subjects</label>
+                            <select class="selectpicker" multiple id="subject_ids" name="subject_ids" data-width="100%">
+                                {% for subject in schedule.subjects %}
+                                    {% if subject in selected_subjects %}
+                                        <option selected value="{{ subject.subject_id }}">{{ subject.name }}</option>
+                                    {% else %}
+                                        <option value="{{ subject.subject_id }}">{{ subject.name }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="teacher_ids">Teachers</label>
+                            <select class="selectpicker" multiple id="teacher_ids" name="teacher_ids" data-width="100%">
+                                {% for teacher in schedule.teachers %}
+                                    {% if teacher in selected_teachers %}
+                                        <option selected value="{{ teacher.teacher_id }}">{{ teacher.name }}</option>
+                                    {% else %}
+                                        <option value="{{ teacher.teacher_id }}">{{ teacher.name }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="group_ids">Studying Groups</label>
+                            <select class="selectpicker" multiple id="group_ids" name="group_ids" data-width="100%">
+                                {% for group in schedule.students_groups %}
+                                    {% if group in selected_groups %}
+                                        <option selected value="{{ group.group_id }}">{{ group.name }}</option>
+                                    {% else %}
+                                        <option value="{{ group.group_id }}">{{ group.name }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col mt-4">
+                        <button type="submit" class="btn btn-info mt-2">Apply</button>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+    <div class="table-responsive-xl">
+        <table class="table table-bordered">
+
+            <thead>
+                <tr>
+                    <th scope="col">Class Hours / Days</th>
+                    {% for day in sorted_days %}
+                        <th scope="col">{{ day.name }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+
+            
+            <tbody>
+                {% set ns = namespace(index=0) %}
+                {% for classtime in sorted_classtimes %}
+                    <tr>
+                        <th scope="row">lesson {{ classtime.index }} ({{ classtime.start_time }} - {{ classtime.end_time }})</th>
+                        {% set scheduled = classtime.intersection(schedule.classes) %}
+                        
+                        {% for day in sorted_days %}
+                            {% if classtime.index <= day.last_class_time.index %}
+                                <td>
+                                    <div>
+                                        {% set scheduled = day.intersection(scheduled) %}
+                                        
+                                        {% for classroom in schedule.classrooms %}
+                                            
+                                            {% set scheduled = classroom.intersection(scheduled) %}
+                                            {% set current_class = None %}
+                                            {% if scheduled|length > 0 %}
+                                                {% set current_class = scheduled.pop() %}
+                                            {% endif %}
+
+
+                                            {% set show = false %}
+                                            {% if is_filter %}
+                                                {% if current_class %}
+                                                    {% if or_true_and_false %}
+                                                        {% if current_class.subject_in_list(selected_subjects) or current_class.teacher_in_list(selected_teachers) or current_class.groups_intersection(selected_groups)|length > 0 %}
+                                                            {% set show = true %}
+                                                        {% endif %}
+                                                    {% else %}
+                                                        {% if current_class.subject_in_list(selected_subjects) and current_class.teacher_in_list(selected_teachers) and current_class.groups_intersection(selected_groups)|length > 0 %}
+                                                            {% set show = true %}
+                                                        {% endif %}
+                                                    {% endif %}
+                                                {% endif %}
+                                            {% else %}
+                                                {% set show = true %}
+                                            {% endif %}
+                                            
+                                            {% if show %}
+                                                <div class="card">
+                                                    <div class="card-header" id="heading{{ ns.index }}">
+                                                        <span data-toggle="collapse" data-target="#collapse{{ ns.index }}" aria-expanded="true" aria-controls="collapse{{ ns.index }}">
+                                                            <div class="row">
+                                                                <div class="col-8 text-left">
+                                                                    {% set room_tooltip = classroom.num_seats|string + " seats, equipment: " + classroom.equipment.__str__() %}
+                                                                    <button class="btn btn-link btn-sm" data-toggle="tooltip" data-placement="top" title="{{ room_tooltip }}">
+                                                                        {% if current_class %}
+                                                                            Classroom: {{ classroom.name }}
+                                                                        {% else %}
+                                                                            Classroom: {{ classroom.name }} (empty)
+                                                                        {% endif %}
+                                                                    </button>
+                                                                </div>
+                                                                <div class="col text-right">
+                                                                    <button class="btn btn-link btn-sm">
+                                                                        <i class="fa fa-chevron-down pull-right"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </span>
+                                                    </div>
+                                                
+                                                    <div id="collapse{{ ns.index }}" class="collapse multi-collapse show" aria-labelledby="heading{{ ns.index }}">
+                                                        <div class="card-body">
+                                                            {% if current_class %}
+                                                                <h6>Subject: {{ current_class.subject.__str__() }}</h6>
+                                                                <h6>Teacher: {{ current_class.teacher.name }}</h6>
+                                                                <h6>Study group/s: 
+                                                                {% for group in current_class.students_groups %}
+                                                                    {% if group.group_id != current_class.students_groups[0].group_id %}
+                                                                        , 
+                                                                    {% endif %}
+                                                                    {{ group.name }}
+                                                                {% endfor %}
+                                                                </h6>
+                                                                <h6>Required equipment: {{ current_class.equipment_required.__str__() }}</h6>
+                                                                <!-- Button trigger modal -->
+                                                                <button type="button" class="btn btn-outline-warning btn-sm" data-toggle="modal" data-target="#modal{{ ns.index }}">
+                                                                    Reschedule
+                                                                </button>
+                                                                
+                                                                <!-- Modal -->
+                                                                <div class="modal fade" id="modal{{ ns.index }}" tabindex="-1" role="dialog" aria-labelledby="#modalLabel{{ ns.index }}" aria-hidden="true">
+                                                                    <div class="modal-dialog" role="document">
+                                                                        <div class="modal-content">
+                                                                            <div class="modal-header">
+                                                                                <h5 class="modal-title" id="modalLabel{{ ns.index }}">Reschedule Class</h5>
+                                                                            </div>
+
+                                                                            <div class="modal-body">
+                                                                                <form action="{{ url_for('views.relocate_class') }}" method='POST'>
+                                                                                    <input type="hidden" id="schedule_id" name="schedule_id" value="{{ schedule.schedule_id }}">
+                                                                                    <input type="hidden" id="class_id" name="class_id" value="{{ current_class.class_id }}">
+
+                                                                                    <div class="form-group">
+                                                                                        <label for="day_time_ids">Day & Class Hour</label>
+                                                                                        <select class="selectpicker" data-size="6" name="day_time_ids" id="day_time_ids" required data-width="100%" data-live-search="true">
+                                                                                            {% for day in schedule.days %}
+                                                                                                <optgroup label="{{ day.name }}">
+                                                                                                    {% for classtime in schedule.classtimes %} 
+                                                                                                        {% if classtime.index <= day.last_class_time.index %}
+                                                                                                            {% set current_title = day.name + " - lesson " + classtime.index|string + " (" + classtime.start_time + " - " + classtime.end_time + ")" %}
+                                                                                                            {% if current_class.day.day_id == day.day_id and current_class.class_time.class_time_id == classtime.class_time_id %}
+                                                                                                                <option selected data-tokens="{{ day.name }}" title="{{ current_title }}" value="{{ day.day_id }},{{ classtime.class_time_id }}">
+                                                                                                                    lesson {{ classtime.index }} ({{ classtime.start_time }} - {{ classtime.end_time }})
+                                                                                                                </option>
+                                                                                                            {% else %}
+                                                                                                                <option data-tokens="{{ day.name }}" title="{{ current_title }}" value="{{ day.day_id }},{{ classtime.class_time_id }}">
+                                                                                                                    lesson {{ classtime.index }} ({{ classtime.start_time }} - {{ classtime.end_time }})
+                                                                                                                </option>
+                                                                                                            {% endif %}
+                                                                                                        {% endif %}
+                                                                                                    {% endfor %}
+                                                                                                </optgroup>
+                                                                                            {% endfor %}
+                                                                                        </select>
+                                                                                    </div>
+ 
+
+                                                                                    <div class="form-group">
+                                                                                        <label for="classroom_id">Classroom</label>
+                                                                                        <select class="selectpicker" data-size="6" id="classroom_id" name="classroom_id" required data-width="100%" data-live-search="true">
+                                                                                            {% for classroom in schedule.classrooms %}
+                                                                                                {% if current_class.classroom.classroom_id == classroom.classroom_id %}
+                                                                                                    <option selected value="{{ classroom.classroom_id }}">
+                                                                                                        {{ classroom.name }} ({{ classroom.num_seats }} seats, equipment: {{ classroom.equipment.__str__() }})
+                                                                                                    </option>
+                                                                                                {% else %}
+                                                                                                    <option value="{{ classroom.classroom_id }}">
+                                                                                                        {{ classroom.name }} ({{ classroom.num_seats }} seats, equipment: {{ classroom.equipment.__str__() }})
+                                                                                                    </option>
+                                                                                                {% endif %}
+                                                                                            {% endfor %}
+                                                                                        </select>
+                                                                                    </div>
+                                                                                    
+                                                                                    <div class="modal-footer">
+                                                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                                                        <button type="sumbit" class="btn btn-primary">Save changes</button>
+                                                                                    </div>
+                                                                                </form>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {% set ns.index = ns.index + 1 %}
+                                            {% endif %}
+
+                                        {% endfor %}
+                                    </div>
+                                </td>
+                            {% endif %}
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

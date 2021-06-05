@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<script src="/static/js/tableSearch.js"></script>
+    <title>School Days</title>
+{% endblock %}
+
+{% block body %}
+
+    <div class="h-100 p-5 bg-light border rounded-3">
+        <h2>School Days</h2>
+        <p>Here you can specify the studying days and when each one of them ends.</p>
+        <div class="row">
+            <div class="col">
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addModal">Add School Day</button>
+            </div>
+            <div class="col text-right">
+                <a type="button" class="btn btn-link" href="{{ url_for('views.classrooms') }}">Continue to Classrooms >></a>
+            </div>
+        </div>
+    </div>
+
+    &nbsp;&nbsp;
+    
+    <!--Adding ClassTime Modal-->
+    <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Add School Day</h5>
+                </div>
+
+                <div class="modal-body">
+                    <form action="{{url_for('views.days')}}" method='POST'>
+                        <div class="row">
+                            <div class="col">
+                                <label for="day_name">Day in the week</label>
+                                <div class="form-group">
+                                    <select class="selectpicker" data-size="6" id="day_name" name="day_name" required data-width="100%">
+                                        <option></option>
+                                        {% for str_day in left_days_dict %}
+                                            {% if left_days_dict[str_day] %}
+                                                <option>{{ str_day }}</option>
+                                            {% else %}
+                                                <option disabled data-subtext="(Already Chosen)">{{ str_day }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <label for="last_ct_id">Last lesson*</label>
+                                <div class="form-group">
+                                    <select class="selectpicker" data-size="6" id="last_ct_id" name="last_ct_id" required data-width="100%">
+                                        <option></option>
+                                        {% for classtime in classtimes %}
+                                            <option value="{{ classtime.class_time_id }}">
+                                                lesson {{ classtime.index }} ({{ classtime.start_time }} - {{ classtime.end_time }})
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class = "row mb-2 ml-2">
+                            <small>*Currently, Every day can starts from the first lesson</small>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Add</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <br>
+    {% if days|length > 0 %}
+        <input class="form-control mb-2" id="myInput" type="text" placeholder="Search...">
+        <div class="table-responsive-md">
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>Day Number</th>
+                    <th>Day in the week</th>
+                    <th>Last Class Hour</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody id="myTable">
+                {% for day in days %}
+                    <tr>
+                        <td>{{ day.index }}</td>
+                        <td>{{ day.name }}</td>
+                        {% set classtime = day.last_class_time %}
+                        <td>lesson {{ classtime.index }} ({{ classtime.start_time }} - {{ classtime.end_time }})</td>
+                        <td>
+                            <div class="row justify-content-center">
+                                <form method="post" action="{{ url_for('views.edit_day') }}">
+                                    <input type="hidden" id="id" name="id" value="{{ day.day_id }}">
+                                    <input type="hidden" id="action" name="action" value="send">
+                                    <button class="btn btn-warning ml-2 mr-2 mt-1 mb-1" type="submit">Edit</button>
+                                </form>
+                                <form method="post" action="{{ url_for('views.delete_day') }}">
+                                    <input type="hidden" id="id" name="id" value="{{ day.day_id }}">
+                                    <button class="btn btn-danger ml-2 mr-2 mt-1 mb-1" type="submit">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <h6>Currently there are no school days</h6>
+    {% endif %}
+
+{% endblock %}

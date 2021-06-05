@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <script src="/static/js/tableSearch.js"></script>
+    <title>Teachers</title>
+{% endblock %}
+
+{% block body %}
+
+    <div class="h-100 p-5 bg-light border rounded-3">
+        <h2>Teachers</h2>
+        <p>Here you can specify the teachers teaching in school.</p>
+        <div class="row">
+            <div class="col">
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addModal">Add Teacher</button>
+            </div>
+            <div class="col text-right">
+                <a type="button" class="btn btn-link" href="{{ url_for('views.studygroups') }}">Continue to Study Groups>></a>
+            </div>
+        </div>
+    </div>
+
+    &nbsp;&nbsp;
+    
+    <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Add Teacher</h5>
+                </div>
+
+                <div class="modal-body">
+                    <form autocomplete="off" action="{{url_for('views.teachers')}}" method='POST'>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="name">Name</label>
+                                    <input class="form-control" type="text" name="name" id="name" required>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <label for="subject_ids">Subjects (Teaching)</label>
+                                <div class="form-group">
+                                    <select class="selectpicker" data-size="6" multiple id="subject_ids" name="subject_ids" required data-width="100%">
+                                    {% for subject in subjects %}
+                                        <option value="{{ subject.subject_id }}">
+                                            {{ subject.__str__() }}
+                                        </option>
+                                    {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Add</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+   
+    <br>
+    {% if teachers|length > 0 %}
+        <input class="form-control mb-2" id="myInput" type="text" placeholder="Search...">
+        <div class="table-responsive-md">
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Subjects</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody id="myTable">
+                {% for teacher in teachers %}
+                    <tr>
+                        <td>{{ teacher.name }}</td>
+                        <td>
+                            {% for subject in teacher.subjects %}
+                                {% if subject.subject_id != teacher.subjects[0].subject_id %}
+                                    , 
+                                {% endif %}
+                                {{ subject.__str__() }}
+                            {% endfor %}
+                        </td>
+                        <td>
+                            <div class="row justify-content-center">
+                                <form method="post" action="{{ url_for('views.edit_teacher') }}">
+                                    <input type="hidden" id="id" name="id" value="{{ teacher.teacher_id }}">
+                                    <input type="hidden" id="action" name="action" value="send">
+                                    <button class="btn btn-warning ml-2 mr-2 mt-1 mb-1" type="submit">Edit</button>
+                                </form>
+                                <form method="post" action="{{ url_for('views.delete_teacher') }}">
+                                    <input type="hidden" id="id" name="id" value="{{ teacher.teacher_id }}">
+                                    <button class="btn btn-danger ml-2 mr-2 mt-1 mb-1" type="submit">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>    
+    {% else %}
+        <h6>Currently there are no teachers</h6>
+    {% endif %}
+    
+{% endblock %}

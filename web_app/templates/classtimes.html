@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <script src="/static/js/tableSearch.js"></script>
+    <title>Class Hours</title>
+{% endblock %}
+
+{% block body %}
+
+    <div class="h-100 p-5 bg-light border rounded-3">
+        <h2>Class Hours</h2>
+        <p>Here you can define in which hours classes take place.</p>
+        
+        <div class="row">
+            <div class="col">
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addModal">Add Class Hour</button>
+            </div>
+            <div class="col text-right">
+                <a type="button" class="btn btn-link" href="{{ url_for('views.days') }}">Continue to School Days >></a>
+            </div>
+        </div>
+    </div>
+
+    &nbsp;&nbsp;
+    
+    <!--Adding ClassTime Modal-->
+    <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Add Class Hour</h5>
+                </div>
+
+                <div class="modal-body">
+                    <form action="{{url_for('views.classtimes')}}" method='POST'>
+                        <div class="row">
+                            <div class="col">
+                                <label for="start_time">Start Time</label>
+                                <input type="time" name="start_time" id="start_time" required class="form-control"
+                                data-toggle="tooltip" data-placement="top" title="Type or choose time" <i class="fa fa-chevron-down pull-right"></i>
+                            </div>
+                            <div class="col">
+                                <label for="end_time">End Time</label>
+                                <input type="time" name="end_time" id="end_time" required class="form-control"
+                                data-toggle="tooltip" data-placement="top" title="Type or choose time" <i class="fa fa-chevron-down pull-right"></i>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Add</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br>
+    {% if classtimes|length > 0 %}
+        <input class="form-control mb-2" id="myInput" type="text" placeholder="Search...">
+        <div class="table-responsive-md">
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>Lesson Number</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody id="myTable">
+                {% for class_time in classtimes %}
+                    <tr>
+                        <td>{{ class_time.index }}</td>
+                        <td>{{ class_time.start_time }}</td>
+                        <td>{{ class_time.end_time }}</td>
+                        <td>
+                            <div class="row justify-content-center">
+                                <form method="post" action="{{ url_for('views.edit_ct') }}">
+                                    <input type="hidden" id="id" name="id" value="{{ class_time.class_time_id }}">
+                                    <input type="hidden" id="action" name="action" value="send">
+                                    <button class="btn btn-warning ml-2 mr-2 mt-1 mb-1" type="submit">Edit</button>
+                                </form>
+                                <form method="post" action="{{ url_for('views.delete_ct') }}">
+                                    <input type="hidden" id="id" name="id" value="{{ class_time.class_time_id }}">
+                                    <button class="btn btn-danger ml-2 mr-2 mt-1 mb-1" type="submit">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <h6>Currently there are no class hours</h6>
+    {% endif %}
+    
+    
+{% endblock %}

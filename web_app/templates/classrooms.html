@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <script src="/static/js/tableSearch.js"></script>
+    <title>Classrooms</title>
+{% endblock %}
+
+{% block body %}
+
+    <div class="h-100 p-5 bg-light border rounded-3">
+        <h2>Classrooms</h2>
+        <p>Here you can define the different rooms for classes in school.</p>
+        <div class="row">
+            <div class="col">
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addModal">Add Classroom</button>
+            </div>
+            <div class="col text-right">
+                <a type="button" class="btn btn-link" href="{{ url_for('views.subjects') }}">Continue to Subjects >></a>
+            </div>
+        </div>
+    </div>
+
+    &nbsp;&nbsp;
+    
+    <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Add Classroom</h5>
+                </div>
+
+                <div class="modal-body">
+                    <form autocomplete="off" action="{{url_for('views.classrooms')}}" method='POST'>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group row">
+                                    <div class="col-lg">
+                                        <label for="name">Classroom Name</label>
+                                        <input class="form-control" type="text" name="name" id="name" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group row">
+                                    <div class="col-lg">
+                                        <label for="num_seats">Number of Seats</label>
+                                        <input class="form-control" type="number" name="num_seats" id="num_seats" min="1" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card" name="mycard" id="mycard">
+                            <div class="card-header">
+                                Equipment (optional)
+                            </div>
+                            
+                            <div class="card-body">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" name="{{ equipment_options[0] }}" id="{{ equipment_options[0] }}" value="True">
+                                    <label class="form-check-label" for="{{ equipment_options[0] }}">{{ equipment_options[0] }}</label><br>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" name="{{ equipment_options[1] }}" id="{{ equipment_options[1] }}" value="True">
+                                    <label class="form-check-label" for="{{ equipment_options[1] }}">{{ equipment_options[1] }}</label><br>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" name="{{ equipment_options[2] }}" id="{{ equipment_options[2] }}" value="True">
+                                    <label class="form-check-label" for="{{ equipment_options[2] }}">{{ equipment_options[2] }}</label><br>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" name="{{ equipment_options[3] }}" id="{{ equipment_options[3] }}" value="True">
+                                    <label class="form-check-label" for="{{ equipment_options[3] }}">{{ equipment_options[3] }}</label><br>
+                                </div>
+                            </div>
+                        
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Add</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <br>
+    {% if classrooms|length > 0 %}
+        <input class="form-control mb-2" id="myInput" type="text" placeholder="Search...">
+        <div class="table-responsive-md">
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Capacity (number of seats)</th>
+                    <th>Equipment</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody id="myTable">
+                {% for classroom in classrooms %}
+                    <tr>
+                        <td>{{ classroom.name }}</td>
+                        <td>{{ classroom.num_seats }}</td>
+                        <td>{{ classroom.equipment.__str__() }}</td>
+                        <td>
+                            <div class="row justify-content-center">
+                                <form method="post" action="{{ url_for('views.edit_classroom') }}">
+                                    <input type="hidden" id="id" name="id" value="{{ classroom.classroom_id }}">
+                                    <input type="hidden" id="action" name="action" value="send">
+                                    <button class="btn btn-warning ml-2 mr-2 mt-1 mb-1" type="submit">Edit</button>
+                                </form>
+                                <form method="post" action="{{ url_for('views.delete_cr') }}">
+                                    <input type="hidden" id="id" name="id" value="{{ classroom.classroom_id }}">
+                                    <button class="btn btn-danger ml-2 mr-2 mt-1 mb-1" type="submit">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <h6>Currently there are no classrooms</h6>
+    {% endif %}
+    
+{% endblock %}

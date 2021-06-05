@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+    <title>Edit Study Group</title>
+
+{% endblock %}
+
+{% block body %}
+    <br>
+    <div class="row justify-content-md-center">
+    <div class="col col-md-9">
+        <div class="card">
+            <h5 class="card-header bg-white mt-1 mb-1">Edit Study Group</h5>
+            <div class="card-body">
+                <form autocomplete="off" action="{{url_for('views.edit_sg')}}" method='POST'>
+                    <input type="hidden" id="id" name="id" value="{{ group.group_id }}">
+                    <input type="hidden" id="action" name="action" value="retrieve">
+                    
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group row">
+                                <div class="col-lg">
+                                    <label for="name">Name</label>
+                                    <input class="form-control" type="text" name="name" id="name" required value="{{ group.name }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group row">
+                                <div class="col-lg">
+                                    <label for="num_students">Number of students</label>
+                                    <input class="form-control" type="number" name="num_students" id="num_students" min="1" required value="{{ group.num_students }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subject_ids">Subjects (Studying)</label>
+                        <select class="selectpicker" data-size="6" multiple id="subject_ids" name="subject_ids" required data-width="100%">
+                            {% for subject in subjects %}
+                                {% if subject in group.subjects %}
+                                    <option selected value="{{ subject.subject_id }}">
+                                        {{ subject.__str__() }}
+                                    </option>
+                                {% else %}
+                                    <option value="{{ subject.subject_id }}">
+                                        {{ subject.__str__() }}
+                                    </option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="text-right mt-4 mb-2">
+                        <a type="button" class="btn btn-secondary mr-2" href="{{ url_for('views.studygroups') }}">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                    
+                </form>
+             
+            </div>
+        </div>
+    </div>
+    </div>
+
+{% endblock %}

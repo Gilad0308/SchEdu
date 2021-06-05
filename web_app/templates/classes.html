@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <script src="/static/js/tableSearch.js"></script>
+    <title>Classes</title>
+{% endblock %}
+
+{% block body %}
+
+    <div class="h-100 p-5 bg-light border rounded-3">
+        <h2>Classes</h2>
+        <p>Here you can specify all the classes you want to be scheduled.</p>
+        <div class="row">
+            <div class="col">
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addModal">Add Class</button>
+            </div>
+            <div class="col text-right">
+                <a type="button" class="btn btn-link" href="{{ url_for('views.schedules') }}">Create, Edit and View Schedules >></a>
+            </div>
+        </div>
+    </div>
+
+    &nbsp;&nbsp;
+    
+    <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Add Class</h5>
+                </div>
+
+                <div class="modal-body">
+                    <form action="{{url_for('views.classes')}}" method='POST'>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="subject_id">Subject</label>
+                                    <select class="selectpicker" data-size="6" id="subject_id" name="subject_id" required data-width="100%">
+                                        <option></option>
+                                        {% for subject in subjects %}
+                                            <option value="{{ subject.subject_id }}">
+                                                {{ subject.__str__() }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="teacher_id">Teacher</label>
+                                    <select class="selectpicker" data-size="6" id="teacher_id" name="teacher_id" required data-width="100%">
+                                        <option></option>
+                                        {% for teacher in teachers %}
+                                            <option value="{{ teacher.teacher_id }}">
+                                                {{ teacher.name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="group_ids">Study Groups</label>
+                                    <select class="selectpicker" data-size="6" multiple id="group_ids" name="group_ids" required data-width="100%">
+                                        {% for group in groups %}
+                                            <option value="{{ group.group_id }}">
+                                                {{ group.name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group row">
+                                    <div class="col-lg">
+                                        <label for="num_per_week">Number of classes per week</label>
+                                        <input class="form-control" type="number" name="num_per_week" id="num_per_week" min="1" value="1" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card" name="mycard" id="mycard">
+                            <div class="card-header">
+                                Equipment Needed (optional)
+                            </div>
+
+                            <div class="card-body">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" name="{{ equipment_options[0] }}" id="{{ equipment_options[0] }}" value="True">
+                                    <label class="form-check-label" for="{{ equipment_options[0] }}">{{ equipment_options[0] }}</label><br>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" name="{{ equipment_options[1] }}" id="{{ equipment_options[1] }}" value="True">
+                                    <label class="form-check-label" for="{{ equipment_options[1] }}">{{ equipment_options[1] }}</label><br>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" name="{{ equipment_options[2] }}" id="{{ equipment_options[2] }}" value="True">
+                                    <label class="form-check-label" for="{{ equipment_options[2] }}">{{ equipment_options[2] }}</label><br>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" name="{{ equipment_options[3] }}" id="{{ equipment_options[3] }}" value="True">
+                                    <label class="form-check-label" for="{{ equipment_options[3] }}">{{ equipment_options[3] }}</label><br>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Add</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <br>
+    {% if classes|length > 0 %}
+        <input class="form-control mb-2" id="myInput" type="text" placeholder="Search...">
+        <div class="table-responsive-md">
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Teacher</th>
+                    <th>Study Group/s</th>
+                    <th>Required Equipment</th>
+                    <th>Classes Per Week</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody id="myTable">
+                {% for current_class in classes %}
+                    <tr>
+                        <td>{{ current_class.subject.__str__() }}</td>
+                        <td>{{ current_class.teacher.name }}</td>
+                        <td>
+                            {% for group in current_class.students_groups %}
+                                {% if group.group_id != current_class.students_groups[0].group_id %}
+                                    , 
+                                {% endif %}
+                                {{ group.name }}
+                            {% endfor %}
+                        </td>
+                        <td>{{ current_class.equipment_required.__str__() }}</td>
+                        <td>{{ current_class.num_per_week }}</td>
+                        <td>
+                            <div class="row justify-content-center">
+                                <form method="post" action="{{ url_for('views.edit_class') }}">
+                                    <input type="hidden" id="id" name="id" value="{{ current_class.class_id }}">
+                                    <input type="hidden" id="action" name="action" value="send">
+                                    <button class="btn btn-warning ml-2 mr-2 mt-1 mb-1" type="submit">Edit</button>
+                                </form>
+                                <form method="post" action="{{ url_for('views.delete_class') }}">
+                                    <input type="hidden" id="id" name="id" value="{{ current_class.class_id }}">
+                                    <button class="btn btn-danger mr-2 ml-2 mt-1 mb-1" type="submit">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+    {% else %}
+        <h6>Currently there are no classes</h6>
+    {% endif %}
+    
+{% endblock %}
