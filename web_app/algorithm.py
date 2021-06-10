@@ -11,6 +11,7 @@ from .models import ClassTime, Day, Equipment, Classroom, Subject, Teacher, Stud
 from flask import request, redirect, url_for, flash, Blueprint, session
 from flask_login import login_required, current_user
 from datetime import datetime
+import pytz
 
 
 algorithm = Blueprint('algorithm', __name__)
@@ -27,9 +28,11 @@ def create_schedule():
         schedule_name = None
         if 'name' in request.form:
             schedule_name = request.form['name']
+        current_tz = request.form['time_zone']
+        date_created = datetime.now(pytz.timezone(current_tz))
 
         # Activates algorithm
-        schedule = Schedule(name=schedule_name, user=current_user, date_created=datetime.now())
+        schedule = Schedule(name=schedule_name, user=current_user, date_created=date_created)
         ACourseClasses, a_days, a_classtimes, a_classrooms = data_from_db(schedule)
         algorithm = Algorithm(ACourseClasses, a_days, a_classtimes, a_classrooms)
         returned_tuple = algorithm.run()

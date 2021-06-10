@@ -15,6 +15,7 @@
         <p class="card-title">Create a new schedule according to your current configuration.</p>
         <p class="card-text">Each one of the classes will be assigned to a suitable day, hour and classroom.</p>
         <form autocomplete="off" id="create_schedule" class="form-inline" action="{{ url_for('algorithm.create_schedule') }}" method='POST'>
+            <input type="hidden" id="time_zone" name="time_zone" value="">
             <div class="form-group mr-2">
                 <input type="text" class="form-control" name="name" id="name" placeholder="Name (optional)">
             </div>
@@ -75,5 +76,13 @@
         {% endif %}          
     </div>
 </div>
+
+<script>
+    function updateTimezone() {
+        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
+        document.getElementById("time_zone").value = tz;
+    }
+    updateTimezone()
+</script>
 
 {% endblock %}
