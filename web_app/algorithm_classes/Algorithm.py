@@ -221,8 +221,13 @@ class Algorithm:
         dict_classes_list = list(schedule.assigning_dict.keys())
         class_1 = random.choice(dict_classes_list)
         class_2 = random.choice(dict_classes_list)
-        while class_2.is_same(class_1):
+        num_classes = len(dict_classes_list)
+        # The number of randomly picked classes that are the same as class_1
+        # Used to limit the number of iterations in case all the classes defined are the same.
+        are_same = 0
+        while class_2.is_same(class_1) and are_same <= num_classes:
             class_2 = random.choice(dict_classes_list)
+            are_same += 1
 
         # swaps between the tuples of the two classes
         new_slot_1 = schedule.assigning_dict[class_2]
@@ -272,13 +277,6 @@ class Algorithm:
         while True:
 
             self.calculate_fitness(current_generation)
-
-            """
-            print(f"Genereation {gen_num} fitness scores: ")
-            for schedule in current_generation:
-                print(f"{schedule.fitness_score}, ")
-            print("\n")
-            """
 
             selected_schedules = []
             if previous_generation[0] is None:
