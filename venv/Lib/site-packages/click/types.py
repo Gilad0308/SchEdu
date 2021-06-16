@@ -123,7 +123,7 @@ class ParamType:
         message: str,
         param: t.Optional["Parameter"] = None,
         ctx: t.Optional["Context"] = None,
-    ) -> t.NoReturn:
+    ) -> "t.NoReturn":
         """Helper method to fail with an invalid value message."""
         raise BadParameter(message, ctx=ctx, param=param)
 
@@ -1000,10 +1000,7 @@ def convert_type(ty: t.Optional[t.Any], default: t.Optional[t.Any] = None) -> Pa
     if ty is float:
         return FLOAT
 
-    # Booleans are only okay if not guessed. For is_flag options with
-    # flag_value, default=True indicates which flag_value is the
-    # default.
-    if ty is bool and not guessed_type:
+    if ty is bool:
         return BOOL
 
     if guessed_type:
